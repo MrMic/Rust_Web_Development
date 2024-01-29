@@ -1,0 +1,9 @@
+# log_level = "warn"
+log_level = "debug"
+database_user = "postgres"
+database_password = "pepere"
+database_host = "172.23.0.3"
+# database_host = "postgres"
+database_port = 5432
+database_name = "rustwebdev"
+port = 8888

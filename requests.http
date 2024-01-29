@@ -1,0 +1,86 @@
+
+### Get all questions
+GET http://localhost:3030/questions
+
+
+### Get query parameters
+GET http://localhost:3030/questions?start=0&end=1
+
+
+### Get query parameters
+GET http://localhost:3030/questions?start=1&end=200
+
+
+### Get query parameters with false parsed values
+GET http://localhost:3030/questions?start=a&end=200
+
+
+### POST a new question 
+POST http://localhost:3030/questions
+content-type: application/json
+
+{
+  "id": 1,
+  "title": "New question 1",
+  "content": "How does this work again?"
+}
+
+
+### POST a new question 2
+POST http://localhost:3030/questions
+content-type: application/json
+
+{
+  "id": "2",
+  "title": "New question 2",
+  "content": "How does this work again?"
+}
+
+
+### POST a BAD new question without id at the end!
+POST http://localhost:3030/questions
+content-type: application/json
+
+{
+  "title": "New question",
+  "content": "How does this work again?"
+}
+
+
+### PUT a question
+PUT http://localhost:3030/questions/1
+content-type: application/json
+
+{
+  "id": "1",
+  "title": "NEW TITLE",
+  "content": "NEW CONTENT"
+}
+
+
+### DELETE a question
+DELETE http://localhost:3030/questions/2
+
+{
+  "id": "2",
+}
+
+
+### REGISTRATION 
+POST http://localhost:3030/registration
+content-type: application/json
+
+{
+  "email": "test@email.com",
+  "password": "cleartext"
+}
+
+
+### LOGIN
+POST http://localhost:3030/login
+content-type: application/json
+
+{
+  "email": "test@email.com",
+  "password": "cleartext"
+}
