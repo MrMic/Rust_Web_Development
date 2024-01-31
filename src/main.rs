@@ -1,6 +1,7 @@
 #[warn(clippy::all)]
 use clap::Parser;
 // use config::Config;
+use std::env;
 
 use handle_errors::return_error;
 use tracing_subscriber::fmt::format::FmtSpan;
@@ -13,7 +14,7 @@ mod types;
 
 // ______________________________________________________________________
 /// Q&A web service API
-#[derive(Parser, Debug, Default, serde::Deserialize, PartialEq)]
+#[derive(Parser, Debug)]
 #[clap(author, version, about, long_about = None)]
 struct Args {
     /// Which errors we want to log (info, warn or error)
@@ -26,7 +27,7 @@ struct Args {
     #[clap(long, default_value = "")]
     database_password: String,
     /// URL for the postgres database
-    #[clap(long, default_value = "172.23.0.3")]
+    #[clap(long, default_value = "172.23.0.2")]
     database_host: String,
     /// PORT number for the postgres database
     #[clap(long, default_value = "5432")]
@@ -38,7 +39,21 @@ struct Args {
 
 // ╾────────────────────────────╼ WRAP Server ╾────────────────────────────╼
 #[tokio::main]
-async fn main() {
+async fn main() -> Result<(), handle_errors::Error> {
+    dotenv::dotenv().ok();
+
+    if let Err(_) = env::var("BAD_WORDS_API_KEY") {
+        panic!("BAD_WORDS_API_KEY not set");
+    }
+    if let Err(_) = env::var("PASETO_KEY") {
+        panic!("PASETO_KEY not set");
+    }
+    let port = std::env::var("PORT")
+        .ok()
+        .map(|val| val.parse::<u16>())
+        .unwrap_or(Ok(3030))
+        .map_err(|e| handle_errors::Error::ParseError(e))?;
+
     // ╾──────────────────────────────╼ CONFIG ╾────────────────────────────╼
     /* let config = Config::builder()
         .add_source(config::File::with_name("setup"))
@@ -84,7 +99,8 @@ async fn main() {
         args.database_port,
         args.database_name
     ))
-    .await;
+    .await
+    .map_err(|e| handle_errors::Error::DatabaseQueryError(e))?;
 
     // let store = store::Store::new("postgres://postgres:pepere@172.23.0.3:5432/rustwebdev").await;
 
@@ -93,8 +109,9 @@ async fn main() {
     sqlx::migrate!()
         .run(&store.clone().connection)
         .await
-        .expect("Cannot Migrate DB");
+        .map_err(|e| handle_errors::Error::MigrationError(e))?;
 
+    // ______________________________________________________________________
     let store_filter = warp::any().map(move || store.clone());
 
     // let id_filter = warp::any().map(|| uuid::Uuid::new_v4().to_string());
@@ -191,5 +208,7 @@ async fn main() {
         .with(warp::trace::request())
         .recover(return_error);
 
-    warp::serve(routes).run(([127, 0, 0, 1], 3030)).await;
+    warp::serve(routes).run(([127, 0, 0, 1], port)).await;
+
+    Ok(())
 }

@@ -12,7 +12,7 @@ use crate::types::{
 };
 
 // ______________________________________________________________________
-#[derive(Clone, Debug)]
+#[derive(Debug, Clone)]
 pub struct Store {
     pub connection: PgPool,
 }
@@ -20,19 +20,16 @@ pub struct Store {
 // ═════════════════════════════════ STORE ═════════════════════════════════
 impl Store {
     // ______________________________________________________________________
-    pub async fn new(db_url: &str) -> Self {
-        let db_pool = match PgPoolOptions::new()
+    pub async fn new(db_url: &str) -> Result<Self, sqlx::Error> {
+        tracing::warn!("{}", db_url);
+        let db_pool = PgPoolOptions::new()
             .max_connections(5)
             .connect(db_url)
-            .await
-        {
-            Ok(pool) => pool,
-            Err(e) => panic!("Couldn't establish DB connection: {}", e),
-        };
+            .await?;
 
-        Store {
+        Ok(Store {
             connection: db_pool,
-        }
+        })
     }
 
     // ______________________________________________________________________
