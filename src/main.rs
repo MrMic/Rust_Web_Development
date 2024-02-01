@@ -1,103 +1,30 @@
 #[warn(clippy::all)]
-use clap::Parser;
-// use config::Config;
-use std::env;
-
 use handle_errors::return_error;
 use tracing_subscriber::fmt::format::FmtSpan;
 use warp::{http::Method, Filter};
 
+mod config;
 mod profanity;
 mod routes;
 mod store;
 mod types;
 
-// ______________________________________________________________________
-/// Q&A web service API
-#[derive(Parser, Debug)]
-#[clap(author, version, about, long_about = None)]
-struct Args {
-    /// Which errors we want to log (info, warn or error)
-    #[clap(short, long, default_value = "debug")]
-    log_level: String,
-    /// Username for the postgres database
-    #[clap(long, default_value = "postgres")]
-    database_user: String,
-    /// Password for the postgres database
-    #[clap(long, default_value = "")]
-    database_password: String,
-    /// URL for the postgres database
-    #[clap(long, default_value = "172.23.0.2")]
-    database_host: String,
-    /// PORT number for the postgres database
-    #[clap(long, default_value = "5432")]
-    database_port: u16,
-    /// Database name
-    #[clap(long, default_value = "rustwebdev")]
-    database_name: String,
-}
-
 // ╾────────────────────────────╼ WRAP Server ╾────────────────────────────╼
 #[tokio::main]
 async fn main() -> Result<(), handle_errors::Error> {
-    dotenv::dotenv().ok();
+    let config = config::Config::new().expect("Config can't be set");
 
-    if let Err(_) = env::var("BAD_WORDS_API_KEY") {
-        panic!("BAD_WORDS_API_KEY not set");
-    }
-    if let Err(_) = env::var("PASETO_KEY") {
-        panic!("PASETO_KEY not set");
-    }
-    let port = std::env::var("PORT")
-        .ok()
-        .map(|val| val.parse::<u16>())
-        .unwrap_or(Ok(3030))
-        .map_err(|e| handle_errors::Error::ParseError(e))?;
-
-    // ╾──────────────────────────────╼ CONFIG ╾────────────────────────────╼
-    /* let config = Config::builder()
-        .add_source(config::File::with_name("setup"))
-        .build()
-        .unwrap();
-
-    let config = config.try_deserialize::<Args>().unwrap(); */
-
-    // ╾─────────────────────────╼ CLAP CLI PARSING ╾───────────────────────╼
-    let args = Args::parse();
-
-    // ━━━━━━━━━━━━━━━━━━━━━━━ LOGGING With WRAP // w/CONFIG ━━━━━━━━━━━━━━━━━
-    /* let log_filter = std::env::var("RUST_LOG").unwrap_or_else(|_| {
+    // ╾──────────────────╼ LOGGING w/WRAP && w/CLAP -= CLI ╾──────────────────╼
+    let log_filter = std::env::var("RUST_LOG").unwrap_or_else(|_| {
         format!(
-            "handle_errors={},rust_web_dev={},warp={}",
+            "handle_errors={},rustwebdev={},warp={}",
             config.log_level, config.log_level, config.log_level
         )
     });
 
     let store = store::Store::new(&format!(
         "postgres://{}:{}@{}:{}/{}",
-        config.database_user,
-        config.database_password,
-        config.database_host,
-        config.database_port,
-        config.database_name
-    ))
-    .await; */
-
-    // ╾──────────────────╼ LOGGING w/WRAP && w/CLAP -= CLI ╾──────────────────╼
-    let log_filter = std::env::var("RUST_LOG").unwrap_or_else(|_| {
-        format!(
-            "handle_errors={},rustwebdev={},warp={}",
-            args.log_level, args.log_level, args.log_level
-        )
-    });
-
-    let store = store::Store::new(&format!(
-        "postgres://{}:{}@{}:{}/{}",
-        args.database_user,
-        args.database_password,
-        args.database_host,
-        args.database_port,
-        args.database_name
+        config.db_user, config.db_password, config.db_host, config.db_port, config.db_name,
     ))
     .await
     .map_err(|e| handle_errors::Error::DatabaseQueryError(e))?;
