@@ -17,7 +17,7 @@ async fn main() -> Result<(), handle_errors::Error> {
     // ╾──────────────────╼ LOGGING w/WRAP && w/CLAP -= CLI ╾──────────────────╼
     let log_filter = std::env::var("RUST_LOG").unwrap_or_else(|_| {
         format!(
-            "handle_errors={},rustwebdev={},warp={}",
+            "handle_errors={},rust_web_dev={},warp={}",
             config.log_level, config.log_level, config.log_level
         )
     });
@@ -60,15 +60,7 @@ async fn main() -> Result<(), handle_errors::Error> {
         .and(warp::path::end())
         .and(warp::query())
         .and(store_filter.clone())
-        .and_then(routes::question::get_questions)
-        .with(warp::trace(|info| {
-            tracing::info_span!(
-                "get_questions request",
-                method = %info.method(),
-                path = %info.path(),
-                id = %uuid::Uuid::new_v4(),
-            )
-        }));
+        .and_then(routes::question::get_questions);
 
     let add_question = warp::post()
         .and(warp::path("questions"))
@@ -135,7 +127,10 @@ async fn main() -> Result<(), handle_errors::Error> {
         .with(warp::trace::request())
         .recover(return_error);
 
-    warp::serve(routes).run(([127, 0, 0, 1], port)).await;
+    tracing::info!("Q&A service build ID {}", env!("RUST_WEB_DEV_VERSION"));
+    // tracing::debug!("Q&A service build ID {}", env!("RUST_WEB_DEV_VERSION"));
+
+    warp::serve(routes).run(([127, 0, 0, 1], config.port)).await;
 
     Ok(())
 }
