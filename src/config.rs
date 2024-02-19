@@ -1,6 +1,6 @@
-use std::env;
-
 use clap::Parser;
+use dotenv;
+use std::env;
 
 // ______________________________________________________________________
 /// Q&A web service API
@@ -20,7 +20,7 @@ pub struct Config {
     #[clap(long)]
     pub db_password: String,
     /// URL for the postgres database
-    #[clap(long, default_value = "172.23.0.3")]
+    #[clap(long, default_value = "localhost")]
     pub db_host: String,
     /// PORT number for the postgres database
     #[clap(long, default_value = "5432")]
@@ -48,11 +48,11 @@ impl Config {
             .unwrap_or(Ok(config.port))
             .map_err(|e| handle_errors::Error::ParseError(e))?;
 
-        let db_user = std::env::var("POSTGRES_USER").unwrap_or(config.db_user.to_owned());
-        let db_password = std::env::var("POSTGRES_PASSWORD").unwrap();
-        let db_host = std::env::var("POSTGRES_HOST").unwrap_or(config.db_host.to_owned());
-        let db_port = std::env::var("POSTGRES_PORT").unwrap_or(config.db_port.to_string());
-        let db_name = std::env::var("POSTGRES_DB").unwrap_or(config.db_name.to_owned());
+        let db_user = env::var("POSTGRES_USER").unwrap_or(config.db_user.to_owned());
+        let db_password = env::var("POSTGRES_PASSWORD").unwrap();
+        let db_host = env::var("POSTGRES_HOST").unwrap_or(config.db_host.to_owned());
+        let db_port = env::var("POSTGRES_PORT").unwrap_or(config.db_port.to_string());
+        let db_name = env::var("POSTGRES_DB").unwrap_or(config.db_name.to_owned());
 
         Ok(Config {
             log_level: config.log_level,
