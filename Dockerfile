@@ -32,6 +32,5 @@ EOF
 FROM debian:bullseye-slim AS final
 
 COPY --from=builder /bin/server ./ 
-COPY ./.env  ./
 
 CMD ["./server"]
