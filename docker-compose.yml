@@ -6,9 +6,12 @@ services:
     env_file:
       - .env
     ports:
-      - "5432:5432"
+      # - "5432:5432"
+      - "5433:5432"
     volumes:
       - ./data:/var/lib/postgresql/data
+    networks:
+      - rust-web
   server:
     build:
       context: .
@@ -18,8 +21,14 @@ services:
     depends_on:
       - database
     networks:
-      - default
+      - rust-web
+      # - default
     ports:
       - "3030:3030"
+
 volumes:
   data:
+
+networks:
+  rust-web:
+    driver: bridge

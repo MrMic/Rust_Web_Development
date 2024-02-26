@@ -20,4 +20,4 @@ jobs:
       # - name: Run tests
       #   run: cargo test --verbose
       - name: Build Docker Image
-        run: docker build -f Dockerfile_1 .
+        run: docker build -f Dockerfile .

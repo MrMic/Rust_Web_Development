@@ -31,6 +31,7 @@ proc-macro2 = "1.0.78"
 openssl = { version = "0.10.63", features = ["vendored"] }
 # ______________________________________________________________________
 watch = "0.2.3"
+criterion = "0.5.1"
 
 [build-dependencies]
 platforms = "2.0.0"
