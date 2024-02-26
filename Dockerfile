@@ -24,6 +24,6 @@ FROM scratch
 WORKDIR /app
 
 COPY --from=builder /app/target/x86_64-unknown-linux-musl/release/rust-web-dev ./ 
-COPY --from=builder /app/.env ./ 
+COPY --from=builder /app/.env.dockerfile ./.env 
 
 CMD [ "/app/rust-web-dev" ]
