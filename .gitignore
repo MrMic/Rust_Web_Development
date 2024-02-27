@@ -16,3 +16,6 @@ Cargo.lock
 # ENV Variables
 .env
 
+# IDEs
+.vscode/
+Session*
