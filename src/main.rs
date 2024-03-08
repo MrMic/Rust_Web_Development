@@ -12,6 +12,7 @@ mod types;
 // ╾────────────────────────────╼ WRAP Server ╾────────────────────────────╼
 #[tokio::main]
 async fn main() -> Result<(), handle_errors::Error> {
+    dotenv::dotenv().ok();
     let config = config::Config::new().expect("Config can't be set");
 
     // ╾──────────────────╼ LOGGING w/WRAP && w/CLAP -= CLI ╾──────────────────╼

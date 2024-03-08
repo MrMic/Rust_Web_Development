@@ -56,7 +56,7 @@ pub fn extract_pagination(params: HashMap<String, String>) -> Result<Pagination,
     Err(Error::MissingParameters)
 }
 
-// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ UNIT TEST ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━  TEST: pagination ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 #[cfg(test)]
 mod pagination_tests {
 
