@@ -1,4 +1,4 @@
-name: Create App
+name: Unit Tests
 
 on:
   push:
