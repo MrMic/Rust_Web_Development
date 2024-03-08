@@ -13,13 +13,11 @@ if &shortmess =~ 'A'
 else
   set shortmess=aoO
 endif
-badd +107 src/types/pagination.rs
-badd +71 src/config.rs
-badd +22 src/main.rs
-badd +13 ~/DEV/RUST_WEB_DEVELOPMENT/CH_10/rust-web-dev-config/.env
+badd +25 src/profanity.rs
+badd +3 ~/DEV/RUST_WEB_DEVELOPMENT/CH_10/rust-web-dev-config/mock-server/src/lib.rs
 argglobal
 %argdel
-edit src/types/pagination.rs
+edit src/profanity.rs
 argglobal
 setlocal fdm=manual
 setlocal fde=0
@@ -30,28 +28,23 @@ setlocal fml=1
 setlocal fdn=20
 setlocal fen
 silent! normal! zE
-5,6fold
-8,15fold
-17,32fold
-37,38fold
-39,44fold
-46,47fold
-36,52fold
-34,54fold
-33,57fold
-71,73fold
-66,76fold
-79,87fold
-90,98fold
-101,110fold
-113,122fold
-61,123fold
+3,5fold
+11,18fold
+21,26fold
+29,30fold
+50,52fold
+55,56fold
+57,59fold
+46,60fold
+62,65fold
+28,66fold
+70,74fold
 let &fdl = &fdl
-let s:l = 107 - ((33 * winheight(0) + 25) / 50)
+let s:l = 8 - ((7 * winheight(0) + 25) / 51)
 if s:l < 1 | let s:l = 1 | endif
 keepjumps exe s:l
 normal! zt
-keepjumps 107
+keepjumps 8
 normal! 01|
 tabnext 1
 if exists('s:wipebuf') && len(win_findbuf(s:wipebuf)) == 0 && getbufvar(s:wipebuf, '&buftype') isnot# 'terminal'

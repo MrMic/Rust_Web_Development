@@ -10,7 +10,8 @@ env:
   CARGO_TERM_COLOR: always
 
 jobs:
-  build:
+  test:
+    needs: build
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -24,10 +25,5 @@ jobs:
             ~/.cargo/git/db/
             target/
           key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
-      - name: Build Rust Binary
-        run: cargo build --verbose
-      - name: Upload Artifacts
-        uses: actions/upload-artifact@v4
-        with:
-          name: binary
-          path: target/debug/rust-web-dev
+      - name: Run tests
+        run: cargo test --verbose
