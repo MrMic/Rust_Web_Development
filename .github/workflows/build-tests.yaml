@@ -26,14 +26,16 @@ jobs:
           key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
       - name: Build Rust Binary
         run: cargo build --verbose
-  tests:
-    runs-on: ubuntu-latest
-    needs: build
-    steps:
-      - name: Run tests
-        run: cargo test --verbose
       - name: Upload Artifacts
         uses: actions/upload-artifact@v4
         with:
           name: binary
           path: target/debug/rust-web-dev
+  tests:
+    runs-on: ubuntu-latest
+    needs: build
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+      - name: Run tests
+        run: cargo test --verbose
