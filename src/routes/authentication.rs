@@ -63,6 +63,7 @@ fn verify_password(hash: &str, password: &[u8]) -> Result<bool, argon2::Error> {
 // ══════════════════════════════  ISSUE_TOKEN ══════════════════════════════
 fn issue_token(account_id: AccountId) -> String {
     let key = env::var("PASETO_KEY").unwrap();
+
     let current_date_time = Utc::now();
     let dt = current_date_time + chrono::Duration::days(1);
 
@@ -73,7 +74,7 @@ fn issue_token(account_id: AccountId) -> String {
     paseto::tokens::PasetoBuilder::new()
         .set_encryption_key(&Vec::from(key.as_bytes()))
         .set_expiration(&dt)
-        .set_not_before(&Utc::now())
+        // .set_not_before(&Utc::now())
         .set_claim("account_id", serde_json::json!(account_id))
         .build()
         .expect("Failed to construct paseto token w/ builder")
@@ -103,4 +104,26 @@ pub fn auth() -> impl Filter<Extract = (Session,), Error = warp::Rejection> + Cl
 
         future::ready(Ok(token))
     })
+}
+
+//          ╔═════════════════════════════════════════════════════════╗
+//          ║                          TESTS                          ║
+//          ╚═════════════════════════════════════════════════════════╝
+#[cfg(test)]
+mod authentication_tests {
+    use super::{auth, env, issue_token, AccountId};
+
+    #[tokio::test]
+    async fn post_questions_auth() {
+        env::set_var("PASETO_KEY", "RANDOM WORDS WINTER MACINTOSH PC");
+        let token = issue_token(AccountId(3));
+
+        let filter = auth();
+
+        let res = warp::test::request()
+            .header("Authorization", token)
+            .filter(&filter);
+
+        assert_eq!(res.await.unwrap().account_id, AccountId(3));
+    }
 }
